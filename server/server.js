@@ -1,14 +1,23 @@
-// server.js
-const express = require("express");
+require('dotenv').config();
+
+const express = require('express');
+const { Sequelize } = require('sequelize');
+const config = require('./config/config.json');
+const sequelize = new Sequelize(config.development);
 const app = express();
-const port = 3001;
 
+// sync tables
+sequelize.sync()
+  .then(() => console.log('Database & tables created!'));
 
-// Define a route handler for GET requests to the root URL
-app.get("/", (req, res) => {
-    res.send("Hello from the API!");
+app.use(express.json());
+
+app.use('/', (req, res, next) => {
+  res.status(200).json({status: true, message: 'Server is running.'});
 });
 
-app.listen(port, () => {
-    console.log(`Success! Your application is running on port ${port}.`);
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
 });

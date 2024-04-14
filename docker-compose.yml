@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'
 services:
   db:
     image: postgres:15.4-alpine3.18 
@@ -8,10 +8,23 @@ services:
       - "5432:5432"
   server:
     build: ./server
+    volumes:
+      - ./server:/app
     ports:
       - "3001:3001"
+    restart: always
+    # volumes:
+    #   - /app/node_modules
+    #   - './api-service:/app'
     depends_on:
       - db
+    environment:
+      - PORT=3001
+      - PGUSER=postgres
+      - PGHOST=db
+      - PGDATABASE=postgres
+      - PGPASSWORD=mysecretpassword
+      - PGPORT=5432
   # client:
   #   build: ./client
   #   ports:
