@@ -1,0 +1,20 @@
+version: '3'
+services:
+  db:
+    image: postgres:15.4-alpine3.18 
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+  server:
+    build: ./server
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+  # client:
+  #   build: ./client
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - server
