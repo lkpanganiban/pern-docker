@@ -8,6 +8,6 @@ RUN apt -y update && apt install -y netcat-traditional
 COPY package.json /app
 RUN npm install
 
-COPY . .
+COPY src /app/src
 
 CMD exec @
