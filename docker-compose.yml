@@ -13,7 +13,6 @@ services:
       - node_modules:/app/node_modules
     ports:
       - "3001:3001"
-    restart: always
     depends_on:
       - db
     environment:
@@ -25,12 +24,12 @@ services:
       - PGPORT=5432
       - SECRET=mydevsecret1234
     command: /app/node_modules/.bin/nodemon server.js
-  # client:
-  #   build: ./client
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - server
-
-volumes:
-  node_modules:
+  client:
+    build: ./client
+    volumes:
+      - ./client/src:/app/src
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    command: npm start

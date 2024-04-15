@@ -1,7 +1,13 @@
 FROM node:20.11.1-slim
-WORKDIR /usr/src/app
-COPY package*.json ./
+
+ENV NODE_ENV development
+
+WORKDIR /app
+RUN apt -y update && apt install -y netcat-traditional
+
+COPY package.json /app
 RUN npm install
+
 COPY . .
-EXPOSE 3000
-CMD [ "npm", "start" ]
+
+CMD exec @
