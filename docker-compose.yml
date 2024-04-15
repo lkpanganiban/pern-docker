@@ -25,6 +25,8 @@ services:
       - PGDATABASE=postgres
       - PGPASSWORD=mysecretpassword
       - PGPORT=5432
+      - SECRET=mydevsecret1234
+    command: npm run dev
   # client:
   #   build: ./client
   #   ports:

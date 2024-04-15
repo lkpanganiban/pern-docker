@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package.json .
 RUN npm install
 
+RUN apt -y update && apt install -y netcat-traditional
+
 COPY . .
 
-CMD ["npm", "run", "dev"]
+ENTRYPOINT ["/app/entrypoint.sh"]
