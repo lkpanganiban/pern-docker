@@ -68,5 +68,25 @@ exports.loginUser = async (req, res) => {
   }else{
     res.status(404).json({ error : "User does not exist" });
   }
+};
 
+exports.verifyJWT = async (req, res, next) => {
+  try {
+    let token = req.headers['authorization'].split(" ")[1];
+    let decoded = jwt.verify(token,process.env.SECRET);
+    req.user = decoded;
+    next();
+  } catch(err){
+    console.log(err)
+    res.status(401).json({"msg":"Couldnt Authenticate"});
+  }
+};
+
+
+exports.userProfile = async (req, res, next) => {
+  let user = await User.findOne({where:{id : req.user.id},attributes:{exclude:["password"]}});
+  if(user === null){
+    res.status(404).json({'msg':"User not found"});
+  }
+  res.status(200).json(user);
 };
