@@ -1,17 +1,19 @@
-require('dotenv').config();
-
 const express = require('express');
-const { Sequelize } = require('sequelize');
-const config = require('./config/config.json');
-const sequelize = new Sequelize(config.development);
 const app = express();
-
-// sync tables
-sequelize.sync()
-  .then(() => console.log('Database & tables created!'));
 
 app.use(express.json());
 
+// sync tables
+const db = require("./models");
+db.sequelize.sync()
+  .then(() => {
+    console.log("Synced db.");
+  })
+  .catch((err) => {
+    console.log("Failed to sync db: " + err.message);
+  });
+
+require("./routes/userRoutes")(app);
 app.use('/', (req, res, next) => {
   res.status(200).json({status: true, message: 'Server is running.'});
 });
