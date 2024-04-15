@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.7'
 services:
   db:
     image: postgres:15.4-alpine3.18 
@@ -10,12 +10,10 @@ services:
     build: ./server
     volumes:
       - ./server:/app
+      - node_modules:/app/node_modules
     ports:
       - "3001:3001"
     restart: always
-    # volumes:
-    #   - /app/node_modules
-    #   - './api-service:/app'
     depends_on:
       - db
     environment:
@@ -26,10 +24,13 @@ services:
       - PGPASSWORD=mysecretpassword
       - PGPORT=5432
       - SECRET=mydevsecret1234
-    command: npm run dev
+    command: /app/node_modules/.bin/nodemon server.js
   # client:
   #   build: ./client
   #   ports:
   #     - "3000:3000"
   #   depends_on:
   #     - server
+
+volumes:
+  node_modules:
