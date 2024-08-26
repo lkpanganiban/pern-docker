@@ -1,0 +1,39 @@
+log:
+  level: DEBUG
+
+api:
+  dashboard: true
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+entryPoints:
+  client:
+    address: ":80"
+
+# routes:
+#   server:
+#     rule: "PathPrefix(`/server`)"
+#     service: server
+#   geoserver:
+#     rule: "PathPrefix(`/geoserver/`)"
+#     service: geoserver
+#   client:
+#     rule: "PathPrefix(`/`)"
+#     service: client
+
+# services:
+#   server:
+#     loadBalancer:
+#       servers:
+#         - url: "http://server:3001"
+#   geoserver:
+#     loadBalancer:
+#       servers:
+#         - url: "http://geoserver:7999"
+#   client:
+#     loadBalancer:
+#       servers:
+#         - url: "http://client:3000"

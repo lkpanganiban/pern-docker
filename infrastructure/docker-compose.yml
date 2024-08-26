@@ -1,0 +1,91 @@
+version: '3.7'
+services:
+  db:
+    # image: postgres:15.4-alpine3.18
+    image: postgis/postgis:15-3.4-alpine
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+  server:
+    build: ../server
+    volumes:
+      - ../server:/app
+      - node_modules_server:/app/node_modules
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=Host(`server.local`)"
+      - "traefik.http.services.server.loadbalancer.server.port=3001"
+    # ports:
+    #   - "3001:3001"
+    depends_on:
+      - db
+      - geoserver
+    environment:
+      - PORT=3001
+      - PGUSER=postgres
+      - PGHOST=db
+      - PGDATABASE=postgres
+      - PGPASSWORD=mysecretpassword
+      - PGPORT=5432
+      - SECRET=mydevsecret1234
+    command: /app/node_modules/.bin/nodemon server.js
+  client:
+    build: ../client
+    volumes:
+      - ../client/src:/app/src
+      - ../client/public:/app/public
+      - node_modules_client:/app/node_modules
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client.rule=Host(`web.local`)"
+      - "traefik.http.services.client.loadbalancer.server.port=3000"
+    # ports:
+    #   - "3000:3000"
+    depends_on:
+      - server
+      - geoserver
+    command: npm start
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.25.2
+    environment:
+      # - INSTALL_EXTENSIONS=true
+      # - STABLE_EXTENSIONS=wps,csw
+      - EXTRA_JAVA_OPTS=-Xms1G -Xmx2G
+      - POSTGRES_JNDI_ENABLED=true
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=geoserver
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_JNDI_RESOURCE_NAME=jdbc/postgres
+      - GEOSERVER_ADMIN_USER=admin
+      - GEOSERVER_ADMIN_PASSWORD=helloworld1234
+    volumes:
+      - geoserver_data:/opt/geoserver_data/
+    # ports:
+    #   - "7999:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.geoserver.rule=Host(`geoserver.local`)"
+      - "traefik.http.services.geoserver.loadbalancer.server.port=8080"
+    depends_on:
+      - db
+
+  traefik:
+    image: traefik:v2.4
+    ports:
+      - "80:80"
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: 
+      - --log.level=DEBUG
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+
+volumes:
+  node_modules_client:
+  node_modules_server:
+  geoserver_data:
