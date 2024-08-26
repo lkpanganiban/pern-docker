@@ -1,7 +1,6 @@
 version: '3.7'
 services:
   db:
-    # image: postgres:15.4-alpine3.18
     image: postgis/postgis:15-3.4-alpine
     environment:
       POSTGRES_PASSWORD: mysecretpassword
@@ -16,8 +15,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`server.local`)"
       - "traefik.http.services.server.loadbalancer.server.port=3001"
-    # ports:
-    #   - "3001:3001"
     depends_on:
       - db
       - geoserver
@@ -40,8 +37,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.client.rule=Host(`web.local`)"
       - "traefik.http.services.client.loadbalancer.server.port=3000"
-    # ports:
-    #   - "3000:3000"
     depends_on:
       - server
       - geoserver
@@ -49,8 +44,6 @@ services:
   geoserver:
     image: docker.osgeo.org/geoserver:2.25.2
     environment:
-      # - INSTALL_EXTENSIONS=true
-      # - STABLE_EXTENSIONS=wps,csw
       - EXTRA_JAVA_OPTS=-Xms1G -Xmx2G
       - POSTGRES_JNDI_ENABLED=true
       - POSTGRES_HOST=db
